@@ -16,7 +16,7 @@
 			</view>
 		</view> -->
 
-		<view class="cu-list menu-avatar margin-top">
+		<view class="cu-list menu-avatar margin-top margin-bottom">
 			<view class="cu-item">
 				<view class="cu-avatar radius lg" style="background-image:url(/static/top.jpg);"></view>
 				<view class="content">
@@ -36,6 +36,14 @@
 		<!-- <input class="input border" type="text" placeholder="请输入" @confirm="sure" v-model="input_text" /> -->
 		<form>
 			<view class="cu-form-group">
+				<view class="title">设定截止时间</view>
+				<picker mode="time" :value="input_ddl" start="00:00" end="23:59" @change="TimeChange">
+					<view class="picker">
+						{{input_ddl}}
+					</view>
+				</picker>
+			</view>
+			<view class="cu-form-group">
 				<view class="title">要做的事</view>
 				<input type="text" maxlength="18" placeholder="在这里输入" name="input" v-model="input_text"></input>
 				<button class='cu-btn bg-red shadow radius' @click="click_btn_go">GO! <text class="cuIcon-add"></text></button>
@@ -51,16 +59,16 @@
 		<view class="">
 			<view class="cu-list menu card-menu flex flex-wrap " v-for="(item,index) in arr" v-show="arr[index].done?false:true"
 			 :key="index">
-				<view class="cu-item padding-sm sm-border  ">
+				<view class="cu-item padding-sm sm-border">
 					<view class="action">
-						<!-- <checkbox class="bg-blue blue" v-bind:checked="arr[index].done" @click="change(index)" /> -->
 						<checkbox-group class="block">
 							<view class="cu-form-group">
 								<checkbox :checked="arr[index].done?true:false" :class="arr[index].done?'checked':''" @click="change(index)"></checkbox>
 							</view>
 						</checkbox-group>
 					</view>
-					<view class="content " :class="[item.done ? 'done' : 'notdone']">{{index + 1}}. {{item.value}}</view>
+					<view class="cu-tag bg-red text-sm margin-right">{{item.ddl}}</view>
+					<view class="content " :class="[item.done ? 'done' : 'notdone']">{{item.value}}</view>
 					<view class="action">
 						<button class="cu-btn bg-green shadow margin-right-sm " @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
 							<text class="cuIcon-edit"></text>
@@ -90,7 +98,7 @@
 							</view>
 						</checkbox-group>
 					</view>
-					<view class="content " :class="[item.done ? 'done' : 'notdone']">{{index + 1}}. {{item.value}}</view>
+					<view class="content " :class="[item.done ? 'done' : 'notdone']">{{item.value}}</view>
 					<view class="action">
 						<button class="cu-btn bg-green shadow margin-right-sm" @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
 							<text class="cuIcon-edit"></text>
@@ -142,6 +150,7 @@
 				title: 'To do list',
 				arr: [],
 				input_text: "",
+				input_ddl: "12:00",
 				edit_text: "",
 				edit_index: "",
 				modalName: null
@@ -149,7 +158,7 @@
 		},
 		onLoad() {
 			this.arr = uni.getStorageSync("my_arr");
-			console.log(this.arr);
+			//console.log(this.arr);
 		},
 		// onReady() {
 		// 	uni.getStorage({
@@ -183,9 +192,14 @@
 			 */
 			click_btn_go() {
 				let value = this.input_text;
+				let ddl = this.input_ddl;
 				this.arr.push({
 					value: value,
-					done: false
+					ddl: ddl,
+					done: false,
+				});
+				this.arr.sort(function(a,b) {
+				return Date.parse('01 Jan 1970 00:'+a.ddl+' GMT')-Date.parse('01 Jan 1970 00:'+b.ddl+' GMT');
 				});
 				this.input_text = "";
 				this.save();
@@ -215,21 +229,21 @@
 					key: 'my_arr',
 					data: this.arr,
 					success: function() {
-						console.log('save success');
+						//console.log('save success');
 					}
 				});
 			},
 
 			showModal(e) {
-				console.log(e);
+				//console.log(e);
 				this.modalName = e.currentTarget.dataset.target;
 			},
 			hideModal(e) {
-				console.log(e);
+				//console.log(e);
 				this.edit_text = "";
 				this.modalName = null;
 			},
-			
+
 			tap_edit(index) {
 				this.edit_index = index;
 				this.edit_text = this.arr[index].value;
@@ -242,13 +256,21 @@
 				let text = this.edit_text;
 				let index = this.edit_index;
 				this.arr[index].value = text;
-				console.log(this.arr[index].value);
 				this.edit_text = "";
 				this.modalName = null;
 				this.save();
-			}
+			},
 
-		}
+			TimeChange(e) {
+				this.input_ddl = e.detail.value;
+			},
+			
+
+		},
+		
+		
+
+		
 	}
 </script>
 
