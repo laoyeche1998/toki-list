@@ -89,23 +89,18 @@
 			</view>
 		</view>
 		<view class="">
-			<view class="cu-list menu card-menu flex flex-wrap " v-for="(item,index) in arr" v-show="arr[index].done" :key="index">
-				<view class="cu-item padding-sm sm-border  ">
-					<view class="action">
-						<checkbox-group class="block">
-							<view class="cu-form-group">
-								<checkbox :checked="arr[index].done?true:false" :class="arr[index].done?'checked':''" @click="change(index)"></checkbox>
-							</view>
-						</checkbox-group>
-					</view>
-					<view class="content " :class="[item.done ? 'done' : 'notdone']">{{item.value}}</view>
-					<view class="action">
-						<button class="cu-btn bg-green shadow margin-right-sm" @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
+			<view class="cu-timeline " v-for="(item,index) in arr" v-show="arr[index].done" :key="index">
+				<view class="cu-time text-blue">{{item.ddl}}</view>
+				<view class="cu-item cuIcon-check text-green text-xsl padding ">
+					<view class="content padding cf" >
+						<text class="text-left fl">{{item.value}}</text>
+						<button class="cu-btn bg-green shadow margin-xs fr" @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
 							<text class="cuIcon-edit"></text>
 						</button>
-						<button class="cu-btn bg-green shadow" @click="del(index)">
+						<button class="cu-btn bg-green shadow margin-xs fr" @click="del(index)">
 							<text class="cuIcon-delete"></text>
 						</button>
+						
 					</view>
 				</view>
 			</view>
@@ -276,7 +271,9 @@
 
 <style>
 	page {
-		background: rgb(238, 248, 249);
+		/*background: rgb(238, 248, 249);
+		*/
+	   background: #ffffff;
 	}
 
 
