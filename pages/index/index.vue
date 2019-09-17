@@ -20,14 +20,14 @@
 			<view class="cu-item">
 				<view class="cu-avatar radius lg" style="background-image:url(/static/top.jpg);"></view>
 				<view class="content">
-					<view class="text-grey">ZARD</view>
+					<view class="text-grey">我</view>
 					<view class="text-gray text-sm flex">
 						<view class="text-cut">
 							每天起床第一句，先给自己打个气~
 						</view>
 					</view>
 				</view>
-				
+
 			</view>
 		</view>
 
@@ -38,14 +38,20 @@
 			<view class="cu-form-group">
 				<view class="title">要做的事</view>
 				<input type="text" maxlength="18" placeholder="在这里输入" name="input" v-model="input_text"></input>
-				<button class='cu-btn bg-red shadow' @click="click_btn_go">GO! <text class="cuIcon-add"></text></button>
+				<button class='cu-btn bg-red shadow radius' @click="click_btn_go">GO! <text class="cuIcon-add"></text></button>
 			</view>
 		</form>
 
 
-		<view class="padding">
-			<view class="cu-list menu flex flex-wrap " v-for="(item,index) in arr" :key="index">
-				<view class="cu-item basis-xl margin-xs padding-sm  ">
+		<view class="cu-bar bg-white solid-bottom margin-top margin-bottom">
+			<view class="action">
+				<text class="cuIcon-title text-orange "></text> 待完成
+			</view>
+		</view>
+		<view class="">
+			<view class="cu-list menu card-menu flex flex-wrap " v-for="(item,index) in arr" v-show="arr[index].done?false:true"
+			 :key="index">
+				<view class="cu-item padding-sm sm-border  ">
 					<view class="action">
 						<!-- <checkbox class="bg-blue blue" v-bind:checked="arr[index].done" @click="change(index)" /> -->
 						<checkbox-group class="block">
@@ -56,7 +62,71 @@
 					</view>
 					<view class="content " :class="[item.done ? 'done' : 'notdone']">{{index + 1}}. {{item.value}}</view>
 					<view class="action">
-						<button class="cu-btn bg-green shadow round" @click="del(index)"><text class="cuIcon-delete"></text> 删除</button>
+						<button class="cu-btn bg-green shadow margin-right-sm " @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
+							<text class="cuIcon-edit"></text>
+						</button>
+						<button class="cu-btn bg-green shadow " @click="del(index)">
+							<text class="cuIcon-delete"></text>
+						</button>
+					</view>
+				</view>
+			</view>
+		</view>
+
+
+
+		<view class="cu-bar bg-white solid-bottom margin-top margin-bottom">
+			<view class="action">
+				<text class="cuIcon-title text-green "></text>已完成
+			</view>
+		</view>
+		<view class="">
+			<view class="cu-list menu card-menu flex flex-wrap " v-for="(item,index) in arr" v-show="arr[index].done" :key="index">
+				<view class="cu-item padding-sm sm-border  ">
+					<view class="action">
+						<checkbox-group class="block">
+							<view class="cu-form-group">
+								<checkbox :checked="arr[index].done?true:false" :class="arr[index].done?'checked':''" @click="change(index)"></checkbox>
+							</view>
+						</checkbox-group>
+					</view>
+					<view class="content " :class="[item.done ? 'done' : 'notdone']">{{index + 1}}. {{item.value}}</view>
+					<view class="action">
+						<button class="cu-btn bg-green shadow margin-right-sm" @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
+							<text class="cuIcon-edit"></text>
+						</button>
+						<button class="cu-btn bg-green shadow" @click="del(index)">
+							<text class="cuIcon-delete"></text>
+						</button>
+					</view>
+				</view>
+			</view>
+		</view>
+
+
+
+		<!-- <view class="cu-bar bg-white margin-top">
+			<view class="action">
+				<button class="cu-btn bg-green shadow" @tap="showModal" data-target="DialogModal1">
+					<text class="cuIcon-edit"></text>修改
+				</button>
+			</view>
+		</view> -->
+		<view class="cu-modal" :class="modalName=='DialogModal1'?'show':''">
+			<view class="cu-dialog">
+				<view class="cu-bar bg-white justify-end">
+					<view class="content">修改内容</view>
+					<view class="action" @tap="hideModal">
+						<text class="cuIcon-close text-red"></text>
+					</view>
+				</view>
+				<view class="padding-xl">
+					<input type="text" maxlength="18" placeholder="在这里输入" name="edit" value="edit_text" v-model="edit_text"></input>
+				</view>
+				<view class="cu-bar bg-white justify-end">
+					<view class="action">
+						<button class='cu-btn bg-green shadow margin-right' @tap="click_btn_edit(edit_index)">确定</button>
+						<button class="cu-btn line-green text-green " @tap="hideModal">取消</button>
 					</view>
 				</view>
 			</view>
@@ -71,7 +141,10 @@
 			return {
 				title: 'To do list',
 				arr: [],
-				input_text: ""
+				input_text: "",
+				edit_text: "",
+				edit_index: "",
+				modalName: null
 			}
 		},
 		onLoad() {
@@ -90,7 +163,7 @@
 		// 	});
 		// 	
 		// },
-		
+
 		methods: {
 			/** 按回车确认后显示新的项
 			 * @param {Object} e
@@ -133,19 +206,47 @@
 				this.arr.splice(index, 1);
 				this.save();
 			},
-			
+
 			/** save my storage
 			 *
 			 */
-			save(){
+			save() {
 				uni.setStorage({
-				    key: 'my_arr',
-				    data: this.arr,
-				    success: function () {
-				        console.log('success');
-				    }
+					key: 'my_arr',
+					data: this.arr,
+					success: function() {
+						console.log('save success');
+					}
 				});
 			},
+
+			showModal(e) {
+				console.log(e);
+				this.modalName = e.currentTarget.dataset.target;
+			},
+			hideModal(e) {
+				console.log(e);
+				this.edit_text = "";
+				this.modalName = null;
+			},
+			
+			tap_edit(index) {
+				this.edit_index = index;
+				this.edit_text = this.arr[index].value;
+			},
+
+			/**
+			 * 按下修改窗口中的确认键后，修改待办事项，再清空edit text
+			 */
+			click_btn_edit() {
+				let text = this.edit_text;
+				let index = this.edit_index;
+				this.arr[index].value = text;
+				console.log(this.arr[index].value);
+				this.edit_text = "";
+				this.modalName = null;
+				this.save();
+			}
 
 		}
 	}
