@@ -20,35 +20,37 @@
 			<view class="cu-item">
 				<view class="cu-avatar radius lg" style="background-image:url(/static/top.jpg);"></view>
 				<view class="content">
-					<view class="text-grey">我</view>
-					<view class="text-gray text-sm flex">
-						<view class="text-cut">
-							每天起床第一句，先给自己打个气~
-						</view>
-					</view>
+					<input type="text" class="text-lg text-shadow margin-bottom-xs" maxlength="18" placeholder="昵称" v-model="nickname" @change="save" @blur="save"></input>
+					<input type="text" class="text-gray text-sm" maxlength="18" placeholder="给自己打个气" v-model="title_text" @change="save" @blur="save"></input>
 				</view>
 
 			</view>
 		</view>
 
 
-
-		<!-- <input class="input border" type="text" placeholder="请输入" @confirm="sure" v-model="input_text" /> -->
-		<form>
-			<view class="cu-form-group">
-				<view class="title">设定截止时间</view>
-				<picker mode="time" :value="input_ddl" start="00:00" end="23:59" @change="TimeChange">
-					<view class="picker">
-						{{input_ddl}}
-					</view>
-				</picker>
+		<view class="cu-bar bg-white solid-bottom">
+			<view class="action">
+				<text class="cuIcon-title text-yellow "></text> 添加新事项
 			</view>
-			<view class="cu-form-group">
-				<view class="title">要做的事</view>
-				<input type="text" maxlength="18" placeholder="在这里输入" name="input" v-model="input_text"></input>
-				<button class='cu-btn bg-red shadow radius' @click="click_btn_go">GO! <text class="cuIcon-add"></text></button>
-			</view>
-		</form>
+		</view>
+		<view>
+			<form>
+				<view class="cu-form-group">
+					<view class="title">设定截止时间</view>
+					<picker mode="time" :value="input_ddl" start="00:00" end="23:59" @change="TimeChange">
+						<view class="picker">
+							{{input_ddl}}
+						</view>
+					</picker>
+				</view>
+				<view class="cu-form-group">
+					<view class="title">要做的事</view>
+					<input type="text" maxlength="18" placeholder="在这里输入" name="input" v-model="input_text"></input>
+					<button class='cu-btn bg-red shadow radius' @click="click_btn_go">GO! <text class="cuIcon-add"></text></button>
+				</view>
+			</form>
+		</view>
+		
 
 
 		<view class="cu-bar bg-white solid-bottom margin-top margin-bottom">
@@ -94,13 +96,12 @@
 				<view class="cu-item cuIcon-check text-green text-xsl padding ">
 					<view class="content padding cf" >
 						<text class="text-left fl">{{item.value}}</text>
-						<button class="cu-btn bg-green shadow margin-xs fr" @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
-							<text class="cuIcon-edit"></text>
-						</button>
 						<button class="cu-btn bg-green shadow margin-xs fr" @click="del(index)">
 							<text class="cuIcon-delete"></text>
 						</button>
-						
+						<button class="cu-btn bg-green shadow margin-xs fr" @tap="showModal($event);tap_edit(index)" data-target="DialogModal1">
+							<text class="cuIcon-edit"></text>
+						</button>
 					</view>
 				</view>
 			</view>
@@ -143,6 +144,8 @@
 		data() {
 			return {
 				title: 'To do list',
+				nickname: '昵称',
+				title_text: '每天起床第一句，先给自己打个气~',
 				arr: [],
 				input_text: "",
 				input_ddl: "12:00",
@@ -153,6 +156,8 @@
 		},
 		onLoad() {
 			this.arr = uni.getStorageSync("my_arr");
+			this.nickname = uni.getStorageSync("my_nickname");
+			this.title_text = uni.getStorageSync("my_title_text");
 			//console.log(this.arr);
 		},
 		// onReady() {
@@ -226,6 +231,14 @@
 					success: function() {
 						//console.log('save success');
 					}
+				});
+				uni.setStorage({
+					key: 'my_nickname',
+					data: this.nickname,
+				});
+				uni.setStorage({
+					key: 'my_title_text',
+					data: this.title_text,
 				});
 			},
 
