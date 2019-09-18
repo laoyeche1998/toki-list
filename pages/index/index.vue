@@ -18,7 +18,7 @@
 
 		<view class="cu-list menu-avatar margin-top margin-bottom">
 			<view class="cu-item">
-				<view class="cu-avatar radius lg" style="background-image:url(/static/top.jpg);"></view>
+				<view class="cu-avatar radius lg" style="background-image:url(/static/nezha.jpg);"></view>
 				<view class="content">
 					<input type="text" class="text-lg text-shadow margin-bottom-xs" maxlength="18" placeholder="昵称" v-model="nickname" @change="save" @blur="save"></input>
 					<input type="text" class="text-gray text-sm" maxlength="18" placeholder="给自己打个气" v-model="title_text" @change="save" @blur="save"></input>
